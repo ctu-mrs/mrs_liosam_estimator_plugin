@@ -39,9 +39,9 @@ pre_input="export UAV_NAME="uav${UAV_NUMBER}"; export UAV_NUMBER=$UAV_NUMBER exp
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
-  'Gazebo' "waitForRos; roslaunch mrs_uav_gazebo_simulation simulation.launch world_name:=forest gui:=true
+  'Gazebo' "waitForRos; roslaunch mrs_uav_gazebo_simulation simulation.launch world_name:=mrs_city gui:=true
 "
-  'Spawn' 'waitForTime; rosservice call /mrs_drone_spawner/spawn "$UAV_NUMBER $UAV_TYPE --enable-rangefinder --enable-ground-truth --enable-ouster --ouster-model OS0-32 --use-gpu-ray"
+  'Spawn' 'waitForTime; rosservice call /mrs_drone_spawner/spawn "$UAV_NUMBER $UAV_TYPE --enable-rangefinder --enable-ground-truth --enable-ouster --ouster-model OS0-32 --use-gpu-ray --pos 0 0 0 0"
 '
   'HWApi' 'waitForTime; roslaunch mrs_uav_px4_api api.launch
 '
@@ -49,7 +49,7 @@ input=(
 "
   'Control' "waitForHw; roslaunch mrs_uav_core platform_config:=`rospack find mrs_uav_gazebo_simulation`/config/mrs_uav_system/$UAV_TYPE.yaml core.launch custom_config:=./custom_configs/custom_config.yaml world_config:=./custom_configs/world_config.yaml network_config:=./custom_configs/network_config.yaml
 "
-  'SLAM' 'waitForHw; roslaunch gtsam_playground slam_pipeline.launch OUSTER_TYPE:=OS0-32
+  'SLAM' 'waitForHw; roslaunch liosam_mrs_estimator_plugin slam_pipeline.launch OUSTER_TYPE:=OS0-32
 '
   'AutomaticStart' "waitForControl; roslaunch mrs_uav_autostart automatic_start.launch
 "

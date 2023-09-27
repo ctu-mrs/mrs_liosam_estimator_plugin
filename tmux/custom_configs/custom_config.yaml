@@ -3,10 +3,12 @@ mrs_uav_managers:
   estimation_manager:
 
     state_estimators: [
-     "liosam"
+     "liosam",
+     "rtk",
+     "ground_truth"
     ]
 
-    initial_state_estimator: "liosam" # will be used as the first state estimator
+    initial_state_estimator: "rtk" # will be used as the first state estimator
     agl_height_estimator: "" # only slightly filtered height for checking min height (not used in control feedback)
 
     # namespace of the state estimator
@@ -49,10 +51,10 @@ mrs_uav_managers:
  
         innovation:
           limit: 1.0 # [m] innovation limit that will trigger action
-          action: "eland" # {"eland", "switch", "mitigate"}
+          action: "switch" # {"eland", "switch", "mitigate"}
   
         repredictor: # repredictor for correct fusion of delayed measurements
-          enabled: false
+          enabled: true
           buffer_size: 200 # [samples] how many states and corrections are kept in history (i.e. estimator running at the default 100 Hz rate will be able to fuse corrections with up to 2 s delay with buffer size of 200 samples)
   
         process_noise: # process noise covariance (Q)
@@ -62,12 +64,26 @@ mrs_uav_managers:
   
         corrections: [
           "pos_liosam",
-          "vel_hw_api"
+          "vel_liosam"
         ]
   
         pos_liosam:
           state_id: 0 # 0 - position, 1 - velocity, 2 - acceleration
-          noise: 0.001 # measurement noise covariance (R)
+          noise: 0.01 # measurement noise covariance (R)
+          noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
+          message:
+            type: "nav_msgs/Odometry"
+            topic: "liosam/odometry/imu" # without uav namespace
+            limit: 
+              delay: 2.0 # [s] messages with higher delay will flag correction as unhealthy
+              time_since_last: 1.0 # [s] larger time step between messages will flag correction as unhealthy
+  
+          processors: [] # types of processors attached to this measurement
+
+        vel_liosam:
+          state_id: 1 # 0 - position, 1 - velocity, 2 - acceleration
+          body_frame: false
+          noise: 0.01 # measurement noise covariance (R)
           noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
           message:
             type: "nav_msgs/Odometry"
@@ -78,23 +94,6 @@ mrs_uav_managers:
   
           processors: [] # types of processors attached to this measurement
   
-        vel_hw_api:
-          state_id: 1 # 0 - position, 1 - velocity, 2 - acceleration
-          noise: 1.0 # measurement noise covariance (R)
-          noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
-          message:
-            type: "geometry_msgs/Vector3Stamped"
-            topic: "hw_api/velocity" # without uav namespace
-            limit: 
-              delay: 1.0 # [s] messages with higher delay will flag correction as unhealthy
-              time_since_last: 0.5 # [s] larger time step between messages will flag correction as unhealthy
-  
-          processors: [] # types of processors attached to this measurement
-  
-          median_filter:
-            buffer_size: 20 # the number of samples from which the median is calculated
-            max_diff: 2.0 # [m] reject measurement if difference from median is over this value
- 
       # namespace of the heading estimator
       hdg_liosam: 
 
@@ -134,7 +133,7 @@ mrs_uav_managers:
 
         innovation:
           limit: 1.0 # [m] innovation limit that will trigger action
-          action: "eland" # {"eland", "switch", "mitigate"}
+          action: "switch" # {"eland", "switch", "mitigate"}
 
         max_flight_z: 100.0 # [m] maximum allowed flight Z (in the estimator frame)
 
@@ -148,12 +147,13 @@ mrs_uav_managers:
           acc: 0.1 # acceleration state
 
         corrections: [
-          "pos_liosam"
+          "pos_liosam",
+          "vel_liosam"
         ]
 
         pos_liosam:
           state_id: 0 # 0 - position, 1 - velocity, 2 - acceleration
-          noise: 0.001 # measurement noise covariance (R)
+          noise: 0.01 # measurement noise covariance (R)
           noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
           message:
             type: "nav_msgs/Odometry"
@@ -164,6 +164,71 @@ mrs_uav_managers:
 
           processors: [] # types of processors attached to this measurement
 
+        vel_liosam:
+          state_id: 1 # 0 - position, 1 - velocity, 2 - acceleration
+          body_frame: false # exception: liosam velocity is already in the nav frame
+          noise: 0.01 # measurement noise covariance (R)
+          noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
+          message:
+            type: "nav_msgs/Odometry"
+            topic: "liosam/odometry/imu" # without uav namespace
+            limit: 
+              delay: 2.0 # [s] messages with higher delay will flag correction as unhealthy
+              time_since_last: 1.0 # [s] larger time step between messages will flag correction as unhealthy
+
+          processors: [] # types of processors attached to this measurement
+
+  constraint_manager:
+
+    estimator_types: [
+      "rtk",
+      "liosam",
+      "ground_truth"
+    ]
+
+    constraints: [
+      "slow",
+      "medium",
+      "fast",
+    ]
+
+    # list of allowed gains per odometry mode
+    allowed_constraints:
+      rtk: ["slow", "medium", "fast"]
+      liosam: ["slow", "medium", "fast"]
+      ground_truth: ["slow", "medium", "fast"]
+
+    # those gains will be used automatically when a localization mode switches
+    # and the current gains are not in the allowed list (next paragraphs)
+    default_constraints:
+      rtk: "slow"
+      liosam: "slow"
+      ground_truth: "slow"
+
+  gain_manager:
+
+    estimator_types: [
+      "rtk",
+      "liosam",
+      "ground_truth"
+    ]
+
+    gains: [
+      "supersoft",
+    ]
+
+    # list of allowed gains per odometry mode
+    allowed_gains:
+      rtk: ["supersoft"]
+      liosam: ["supersoft"]
+      ground_truth: ["supersoft"]
+
+    # those gains will be used automatically when a localization mode switches
+    # and the current gains are not in the allowed list (next paragraphs)
+    default_gains:
+      rtk: "supersoft"
+      liosam: "supersoft"
+      ground_truth: "supersoft"
 
   transform_manager:
 
