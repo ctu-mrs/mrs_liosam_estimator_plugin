@@ -1,11 +1,24 @@
 liosam:
 
-  imuType: "os1_imu" # {os1_imu, mavros_imu, vio_imu, xsens_imu}
+  imuType: "motor_speeds" # {os1_imu, mavros_imu, vio_imu, xsens_imu}
+
+  # Motor speed
+  mass: 3.2 # kg
+  propMass: 0.005 # kg
+  numMotors: 4
+  # motorConstant: 12.68433
+  # momentConstant: 0.016
+  motorConstant: 0.000000001
+  momentConstant: 0.01
+
+  linAccNoise: 0.001
+  angAccNoise: 0.001
 
   # Topics
   pointCloudTopic: "os_cloud_nodelet/points_processed"  # Point cloud data
   odomTopic: "liosam/odometry/imu"                     # IMU pre-preintegration odometry, same frequency as IMU
   gpsTopic: "none"                                      # GPS odometry topic from navsat, see module_navsat.launch file
+  motorSpeedTopic: "motor_speed_sync/motor_speeds_sync"
 
   # GPS Settings
   useImuHeadingInitialization: false          # if using GPS data, set to "true"
@@ -29,16 +42,23 @@ liosam:
   timeField: "t"                              # point timestamp field, Velodyne - "time", Ouster - "t"
   downsampleRate: 1                           # default: 1. Downsample your data if too many points. i.e., 16 = 64 / 4, 16 = 16 / 1 
   lidarMinRange: 1.0                          # default: 1.0, minimum lidar range to be used
-  lidarMaxRange: 100.0                        # default: 1000.0, maximum lidar range to be used
+  lidarMaxRange: 30.0                        # default: 1000.0, maximum lidar range to be used
     
   # Default IMU params
   imuGravity: 9.80511
   # Acc/Gyr noise/bias can be found using https://github.com/gaowenliang/imu_utils
  
+  motor_speeds:
+    frame: "fcu"
+    imuTopic: "mavros/imu/data"
+    imuAccBiasN: 0.01
+    imuGyrBiasN: 0.01
+
   # Mavros IMU real
   mavros_imu:
     frame: "fcu"
     imuTopic: "mavros/imu/data"
+    hasOrientation: true
     imuRPYWeight: 0.01
     imuAccNoise: 0.006
     imuGyrNoise: 0.00018665
@@ -52,7 +72,7 @@ liosam:
 
   # Ouster IMU
   os1_imu:
-    frame: "os_imu"
+    frame: "uav25/os_imu"
     imuTopic: "os_cloud_nodelet/imu"
     imuRPYWeight: 0.01
     imuAccNoise: 0.005
@@ -67,18 +87,35 @@ liosam:
 
   # VIO IMU
   vio_imu:
-    frame: "base_link"
-    imuTopic: "vio_imu/data"
-    imuRPYWeight: 0.01
-    imuAccNoise: 1.7391734436505606e+00
-    imuGyrNoise: 1.7232641708847982e-01
-    imuAccBiasN: 2.2595603813254508e-02
-    imuGyrBiasN: 1.0910192034708675e-03
+    # frame: "uav25/vio_imu"
+    frame: "uav25/vio_imu"
+    imuTopic: "vio_imu/imu_filtered"
+    imuRPYWeight: 0.0
+    hasOrientation: false
+    rate: 1000
+    # imuAccNoise: 1.7391734436505606e+00
+    # imuGyrNoise: 1.7232641708847982e-01
+    # imuAccBiasN: 2.2595603813254508e-02
+    # imuGyrBiasN: 1.0910192034708675e-03
+    # imuAccNoise: 0.2
+    # imuGyrNoise: 0.01
+    # imuAccBiasN: 0.01
+    # imuGyrBiasN: 0.01
+    imuAccNoise: 0.01
+    imuGyrNoise: 0.001
+    imuAccBiasN: 0.1
+    imuGyrBiasN: 0.1
     # lidar -> imu tf TBD translation
-    # extrinsicTrans: [0.0, 0.0, 0.0735]
-    # extrinsicRot: [-1, 0, 0,
-    #                0, -1, 0,
-    #                0, 0, 1]
+    # extrinsicTrans: [-0.000190, -0.077014, -0.011502]
+    # extrinsicRot: [
+    #                 0.019088 -0.999818 -0.000334
+    #                -0.010009  0.000143 -0.999950
+    #                 0.999768  0.019091 -0.010005
+    #                ]
+    # extrinsicRPY: [1,  0, 0,
+    #                0, 1, 0,
+    #                 0, 0, 1]
+    
 
   # XSENS MTi-30 IMU
   xsens_imu:

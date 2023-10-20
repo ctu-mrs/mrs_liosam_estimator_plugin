@@ -3,4 +3,4 @@ lidar3d:
   downsampling:
     dynamic_row_selection: false
     row_step: 1
-    col_step: 16
+    col_step: 1
