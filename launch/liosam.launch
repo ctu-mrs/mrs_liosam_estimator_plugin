@@ -5,7 +5,7 @@
     <arg name="UAV_TYPE" default="$(env UAV_TYPE)" />
 
     <arg name="points_topic" default="os_cloud_nodelet/points_processed" />
-    <arg name="number_of_rings" default="128" />
+    <arg name="number_of_rings" default="16" />
     <arg name="samples_per_ring" default="1024" />
 
     <arg name="frame_baselink" default="$(arg UAV_NAME)/base_link" />
@@ -43,6 +43,8 @@
       <param name="is_simulation" type="bool" value="$(arg is_simulation)" />
       <param name="motor_slowdown_constant" type="double" value="$(arg motor_slowdown_constant)" />
       <param name="num_motors" type="int" value="$(arg num_motors)" />
+
+      <remap from="~esc_status_in" to="mavros/esc_status" />
 
       </node>
 

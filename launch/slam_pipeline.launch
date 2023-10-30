@@ -34,9 +34,8 @@
   <!--//}-->
 
   <!--//{ LIOSAM PARAMETERS -->
-  <arg name="liosam/custom_config" default="$(find liosam_mrs_estimator_plugin)/custom_configs/liosam/subt_$(arg UAV_TYPE).yaml" />
-  <arg name="liosam/imu_config" default="$(find liosam_mrs_estimator_plugin)/custom_configs/mrs_imu_utils/subt_$(arg UAV_TYPE)_vio_imu.yaml" />
-  <arg name="liosam/imu_type" default="" />
+  <arg if="$(eval arg('RUN_TYPE') == 'simulation')" name="liosam/imu_type" value="vio_imu" />
+  <arg unless="$(eval arg('RUN_TYPE') == 'simulation')" name="liosam/imu_type" value="" />
   <!--//}-->
 
   <!--//{ TOPICS THROTTLE PARAMETERS -->
@@ -74,9 +73,9 @@
   <!--//}-->
 
   <!--//{ OS DRIVER NODELET (UAV ONLY) -->
-  <include if="$(eval arg('RUN_TYPE') == 'uav')" file="$(find ouster_ros)/launch/uav.launch" >
+  <include if="$(eval arg('RUN_TYPE') == 'realworld')" file="$(find ouster_ros)/launch/uav.launch" >
 
-    <arg name="lidar_mode" value="512x10" />
+    <arg name="lidar_mode" value="1024x10" />
 
     <arg name="nodelet" value="$(arg nodelet)" />
     <arg name="nodelet_manager" value="$(arg nodelet_manager)" />
@@ -110,7 +109,7 @@
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)"/>
 
     <arg name="points_topic" value="$(arg topic/lidar3d/points_proc)" />
-    <arg name="number_of_rings" value="32" />
+    <arg name="number_of_rings" value="16" />
     <arg name="samples_per_ring" value="1024" />
 
     <arg name="frame_baselink" value="$(arg fcu_frame)"/>
@@ -124,13 +123,15 @@
     <arg name="launch_delay" default="1" />
     
     <arg name="imu_type" value="$(arg liosam/imu_type)" />
-    <!-- <arg name="liosam_config" default="$(arg liosam/custom_config)" /> -->
-    <!-- <arg name="imu_config" default="$(arg liosam/imu_config)" /> -->
 
   </include>
   <!--//}-->
 
   <!--//}-->
+
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="ouster_to_vio_imu" args="0.0 -0.08 -0.01 -0.47 -1.54 2.06  $(arg UAV_NAME)/os_sensor $(arg UAV_NAME)/vio_imu" /> -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="ouster_to_vio_imu" args="0.10 0 -0.20 -1.57 0.0 -1.57  $(arg UAV_NAME)/os_sensor $(arg UAV_NAME)/vio_imu" />
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="ouster_to_vio_imu" args="0.0 0 0.0 0.0 0.0 0.0  $(arg UAV_NAME)/os_sensor $(arg UAV_NAME)/vio_imu" /> -->
 
   <!-- THROTTLED TOPICS -->
 
