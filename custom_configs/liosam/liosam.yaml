@@ -1,6 +1,6 @@
 liosam:
 
-  imuType: "os1_imu" # {os1_imu, mavros_imu, vio_imu, xsens_imu}
+  imuType: "motor_speeds" # {os1_imu, mavros_imu, vio_imu, xsens_imu}
 
   # Topics
   pointCloudTopic: "os_cloud_nodelet/points_processed"  # Point cloud data
@@ -35,6 +35,19 @@ liosam:
   imuGravity: 9.80511
   # Acc/Gyr noise/bias can be found using https://github.com/gaowenliang/imu_utils
  
+  motorSpeedTopic: "motor_speed_sync/motor_speeds_sync"                                      # GPS odometry topic from navsat, see module_navsat.launch file
+  linAccNoise: 0.010
+  angAccNoise: 0.010
+
+  motor_speeds:
+    frame: "os_imu"
+    imuTopic: "os_cloud_nodelet/imu"
+    imuRPYWeight: 0.01
+    imuAccNoise: 0.010
+    imuGyrNoise: 0.010
+    imuAccBiasN: 0.01
+    imuGyrBiasN: 0.010
+
   # Mavros IMU real
   mavros_imu:
     frame: "fcu"
