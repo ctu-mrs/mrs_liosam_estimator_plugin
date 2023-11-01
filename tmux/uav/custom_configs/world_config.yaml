@@ -4,12 +4,12 @@
 
 world_origin_units: "LATLON" # {"UTM, "LATLON"}
 
-world_origin_x: 47.397743
-world_origin_y: 8.545594
+world_origin_x: 49.36225
+world_origin_y: 14.26143
 
 safety_area:
 
-  use_safety_area: true
+  use_safety_area: false
 
   frame_name: "local_origin"
 
