@@ -39,7 +39,7 @@ pre_input="export UAV_NAME="uav${UAV_NUMBER}"; export UAV_NUMBER=$UAV_NUMBER exp
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
-  'Gazebo' "waitForRos; roslaunch mrs_uav_gazebo_simulation simulation.launch world_name:=mrs_city gui:=true
+  'Gazebo' "waitForRos; roslaunch mrs_uav_gazebo_simulation simulation.launch world_name:=forest gui:=true
 "
   'Spawn' 'waitForTime; rosservice call /mrs_drone_spawner/spawn "$UAV_NUMBER $UAV_TYPE --enable-rangefinder --enable-ground-truth --enable-ouster --ouster-model OS0-32 --use-gpu-ray --pos 0 0 0 0"
 '

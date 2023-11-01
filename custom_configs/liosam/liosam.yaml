@@ -48,6 +48,10 @@ liosam:
   imuGravity: 9.80511
   # Acc/Gyr noise/bias can be found using https://github.com/gaowenliang/imu_utils
  
+  motorSpeedTopic: "motor_speed_sync/motor_speeds_sync"                                      # GPS odometry topic from navsat, see module_navsat.launch file
+  linAccNoise: 0.010
+  angAccNoise: 0.010
+
   motor_speeds:
     frame: "fcu"
     imuTopic: "mavros/imu/data"
