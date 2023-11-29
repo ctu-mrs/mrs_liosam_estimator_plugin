@@ -4,11 +4,10 @@ mrs_uav_managers:
 
     state_estimators: [
      "liosam",
-     "rtk",
-     "ground_truth"
+     "gps_garmin",
     ]
 
-    initial_state_estimator: "rtk" # will be used as the first state estimator
+    initial_state_estimator: "gps_garmin" # will be used as the first state estimator
     agl_height_estimator: "" # only slightly filtered height for checking min height (not used in control feedback)
 
     # namespace of the state estimator
@@ -181,6 +180,7 @@ mrs_uav_managers:
   constraint_manager:
 
     estimator_types: [
+      "gps_garmin",
       "rtk",
       "liosam",
       "ground_truth"
@@ -194,6 +194,7 @@ mrs_uav_managers:
 
     # list of allowed gains per odometry mode
     allowed_constraints:
+      gps_garmin: ["slow", "medium", "fast"]
       rtk: ["slow", "medium", "fast"]
       liosam: ["slow", "medium", "fast"]
       ground_truth: ["slow", "medium", "fast"]
@@ -201,6 +202,7 @@ mrs_uav_managers:
     # those gains will be used automatically when a localization mode switches
     # and the current gains are not in the allowed list (next paragraphs)
     default_constraints:
+      gps_garmin: "slow"
       rtk: "slow"
       liosam: "slow"
       ground_truth: "slow"
@@ -208,6 +210,7 @@ mrs_uav_managers:
   gain_manager:
 
     estimator_types: [
+      "gps_garmin",
       "rtk",
       "liosam",
       "ground_truth"
@@ -219,6 +222,7 @@ mrs_uav_managers:
 
     # list of allowed gains per odometry mode
     allowed_gains:
+      gps_garmin: ["supersoft"]
       rtk: ["supersoft"]
       liosam: ["supersoft"]
       ground_truth: ["supersoft"]
@@ -226,6 +230,7 @@ mrs_uav_managers:
     # those gains will be used automatically when a localization mode switches
     # and the current gains are not in the allowed list (next paragraphs)
     default_gains:
+      gps_garmin: "supersoft"
       rtk: "supersoft"
       liosam: "supersoft"
       ground_truth: "supersoft"

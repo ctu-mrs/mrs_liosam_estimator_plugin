@@ -51,7 +51,7 @@ input=(
 '
   'Status' "waitForHw; roslaunch mrs_uav_status status.launch
 "
-  'Core' "waitForTime; roslaunch mrs_uav_core core.launch platform_config:=`rospack find mrs_uav_deployment`/config/mrs_uav_system/$UAV_TYPE.yaml custom_config:=./custom_configs/custom_config.yaml world_config:=`rospack find mrs_uav_deployment`/config/worlds/world_$WORLD_NAME.yaml network_config:=./custom_configs/network_config.yaml
+  'Core' "waitForTime; roslaunch mrs_uav_core core.launch platform_config:=`rospack find mrs_uav_deployment`/config/mrs_uav_system/$UAV_TYPE.yaml custom_config:=./custom_configs/custom_config.yaml world_config:=custom_configs/world_config.yaml network_config:=./custom_configs/network_config.yaml
 "
   'SLAM' 'waitForHw; roslaunch liosam_mrs_estimator_plugin slam_pipeline.launch OUSTER_TYPE:=OS1-16
 '
