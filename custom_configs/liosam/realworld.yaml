@@ -46,20 +46,13 @@ motor_speeds:
   # momentConstant: 0.00007
   momentConstant: 0.01
 
-  # linAccNoise: 0.001
-  # angAccNoise: 0.001
-  # linAccNoise: 0.01
-  # angAccNoise: 10.0
-  # linAccBiasNoise: 0.1
-  # angAccBiasNoise: 0.1
+  # works on october camp rosbag
+  linAccNoise: 0.01
+  angAccNoise: 0.1
+  linAccBiasNoise: 0.1
+  angAccBiasNoise: 1.0
 
-  # imuRPYWeight: 0.0
-  # works
-  # linAccNoise: 0.01
-  # angAccNoise: 0.1
-  # linAccBiasNoise: 0.1
-  # angAccBiasNoise: 1
-
+  # october camp rosbag uav25
   initBias:
     angular:
       x: -3.0
