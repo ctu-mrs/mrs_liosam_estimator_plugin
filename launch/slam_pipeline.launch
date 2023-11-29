@@ -109,7 +109,7 @@
     <arg name="UAV_TYPE" value="$(arg UAV_TYPE)"/>
 
     <arg name="points_topic" value="$(arg topic/lidar3d/points_proc)" />
-    <arg name="number_of_rings" value="16" />
+    <arg name="number_of_rings" value="32" />
     <arg name="samples_per_ring" value="1024" />
 
     <arg name="frame_baselink" value="$(arg fcu_frame)"/>

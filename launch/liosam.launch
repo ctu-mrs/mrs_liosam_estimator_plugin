@@ -27,7 +27,7 @@
 
       <!-- Parameters -->
       <rosparam file="$(find liosam_mrs_estimator_plugin)/custom_configs/liosam/liosam.yaml" command="load" />
-      <rosparam param="uav_name" subst_value="True">$(arg UAV_NAME)</rosparam>
+
       <rosparam param="liosam/imuType" subst_value="True">$(arg imu_type)</rosparam>
       <rosparam param="liosam/N_SCAN" subst_value="True">$(arg number_of_rings)</rosparam>
       <rosparam param="liosam/Horizon_SCAN" subst_value="True">$(arg samples_per_ring)</rosparam>
@@ -37,9 +37,11 @@
       <rosparam param="liosam/odometryFrame" subst_value="True">$(arg frame_odom)</rosparam>
       <rosparam param="liosam/mapFrame" subst_value="True">$(arg frame_map)</rosparam>
 
+<!--//{ motor_speed_sync nodelet -->
       <node pkg="nodelet" type="nodelet" name="motor_speed_sync" args="$(arg nodelet) gtsam_playground/MotorSpeedTopicSync $(arg nodelet_manager)" output="screen" launch-prefix="bash -c 'sleep $(arg launch_delay); $0 $@'; $(arg launch_prefix)">
 
       <param name="uav_name" type="string" value="$(arg UAV_NAME)" />
+
       <param name="is_simulation" type="bool" value="$(arg is_simulation)" />
       <param name="motor_slowdown_constant" type="double" value="$(arg motor_slowdown_constant)" />
       <param name="num_motors" type="int" value="$(arg num_motors)" />
@@ -47,8 +49,12 @@
       <remap from="~esc_status_in" to="mavros/esc_status" />
 
       </node>
+<!--//}-->
 
+<!--//{ imu preintegration nodelet -->
       <node pkg="nodelet" type="nodelet" name="imu_preintegration" args="$(arg nodelet) liosam/ImuPreintegration $(arg nodelet_manager)" output="screen" launch-prefix="bash -c 'sleep $(arg launch_delay); $0 $@'; $(arg launch_prefix)">
+
+        <param name="uav_name" type="string" value="$(arg UAV_NAME)" />
 
         <!-- publishers -->
         <remap from="~liosam/imu/path" to="liosam/imu/path" />
@@ -58,16 +64,24 @@
         <remap from="~liosam/mapping/odometry" to="liosam/mapping/odometry" />
 
       </node>
+<!--//}-->
 
+<!--//{ image_projection nodelet -->
       <node pkg="nodelet" type="nodelet" name="image_projection" args="$(arg nodelet) liosam/ImageProjection $(arg nodelet_manager)" output="screen" launch-prefix="bash -c 'sleep $(arg launch_delay); $0 $@'; $(arg launch_prefix)">
+
+      <param name="uav_name" type="string" value="$(arg UAV_NAME)" />
 
       <!-- publishers -->
       <remap from="~liosam/deskew/cloud_deskewed" to="liosam/deskew/cloud_deskewed" />
       <remap from="~liosam/deskew/cloud_info" to="liosam/deskew/cloud_info" />
 
       </node>
+<!--//}-->
 
+<!--//{ feature extraction nodelet -->
       <node pkg="nodelet" type="nodelet" name="feature_extraction" args="$(arg nodelet) liosam/FeatureExtraction $(arg nodelet_manager)" output="screen" launch-prefix="bash -c 'sleep $(arg launch_delay); $0 $@'; $(arg launch_prefix)">
+
+      <param name="uav_name" type="string" value="$(arg UAV_NAME)" />
 
       <!-- publishers -->
       <remap from="~liosam/feature/cloud_info" to="liosam/feature/cloud_info" />
@@ -78,8 +92,12 @@
       <remap from="~liosam/deskew/cloud_info" to="liosam/deskew/cloud_info" />
 
       </node>
+<!--//}-->
 
+<!--//{ map_optimization nodelet -->
       <node pkg="nodelet" type="nodelet" name="map_optimization" args="$(arg nodelet) liosam/MapOptimization $(arg nodelet_manager)" output="screen" launch-prefix="bash -c 'sleep $(arg launch_delay); $0 $@'; $(arg launch_prefix)">
+
+      <param name="uav_name" type="string" value="$(arg UAV_NAME)" />
 
         <!-- publishers -->
         <remap from="~liosam/mapping/trajectory" to="liosam/mapping/trajectory" />
@@ -98,6 +116,7 @@
         <remap from="~liosam/feature/cloud_info" to="liosam/feature/cloud_info" />
         <remap from="~liosam/loop_closure_detection" to="liosam/loop_closure_detection" />
       </node>
+<!--//}-->
 
     </group>
 

@@ -3,12 +3,10 @@ mrs_uav_managers:
   estimation_manager:
 
     state_estimators: [
-     "liosam",
-     "rtk",
-     "ground_truth"
+     "liosam"
     ]
 
-    initial_state_estimator: "rtk" # will be used as the first state estimator
+    initial_state_estimator: "liosam" # will be used as the first state estimator
     agl_height_estimator: "" # only slightly filtered height for checking min height (not used in control feedback)
 
     # namespace of the state estimator
@@ -54,7 +52,7 @@ mrs_uav_managers:
           action: "switch" # {"eland", "switch", "mitigate"}
   
         repredictor: # repredictor for correct fusion of delayed measurements
-          enabled: false
+          enabled: true
           buffer_size: 200 # [samples] how many states and corrections are kept in history (i.e. estimator running at the default 100 Hz rate will be able to fuse corrections with up to 2 s delay with buffer size of 200 samples)
   
         process_noise: # process noise covariance (Q)
@@ -69,11 +67,11 @@ mrs_uav_managers:
   
         pos_liosam:
           state_id: 0 # 0 - position, 1 - velocity, 2 - acceleration
-          noise: 0.01 # measurement noise covariance (R)
+          noise: 10.0 # measurement noise covariance (R)
           noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
           message:
             type: "nav_msgs/Odometry"
-            topic: "liosam/fusion/odometry" # without uav namespace
+            topic: "rosbag_liosam/fusion/odometry" # without uav namespace
             limit: 
               delay: 2.0 # [s] messages with higher delay will flag correction as unhealthy
               time_since_last: 1.0 # [s] larger time step between messages will flag correction as unhealthy
@@ -83,11 +81,11 @@ mrs_uav_managers:
         vel_liosam:
           state_id: 1 # 0 - position, 1 - velocity, 2 - acceleration
           body_frame: false
-          noise: 0.01 # measurement noise covariance (R)
+          noise: 10.0 # measurement noise covariance (R)
           noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
           message:
             type: "nav_msgs/Odometry"
-            topic: "liosam/fusion/odometry" # without uav namespace
+            topic: "rosbag_liosam/fusion/odometry" # without uav namespace
             limit: 
               delay: 2.0 # [s] messages with higher delay will flag correction as unhealthy
               time_since_last: 1.0 # [s] larger time step between messages will flag correction as unhealthy
@@ -102,7 +100,7 @@ mrs_uav_managers:
         position_innovation_limit: 1.0 # [m] innovation limit that will trigger switch to other estimator
 
         repredictor: # repredictor for correct fusion of delayed measurements
-          enabled: false
+          enabled: true
           buffer_size: 200 # [samples] how many states and corrections are kept in history (i.e. estimator running at the default 100 Hz rate will be able to fuse corrections with up to 2 s delay with buffer size of 200 samples)
 
         process_noise: # process noise covariance (Q)
@@ -115,11 +113,11 @@ mrs_uav_managers:
 
         hdg_liosam:
           state_id: 0 # 0 - position, 1 - velocity, 2 - acceleration
-          noise: 0.0001 # measurement noise covariance (R)
+          noise: 1.0 # measurement noise covariance (R)
           noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
           message:
             type: "nav_msgs/Odometry"
-            topic: "liosam/fusion/odometry" # without uav namespace
+            topic: "rosbag_liosam/fusion/odometry" # without uav namespace
             limit: 
               delay: 2.0 # [s] messages with higher delay will flag correction as unhealthy
               time_since_last: 1.0 # [s] larger time step between messages will flag correction as unhealthy
@@ -138,7 +136,7 @@ mrs_uav_managers:
         max_flight_z: 100.0 # [m] maximum allowed flight Z (in the estimator frame)
 
         repredictor: # repredictor for correct fusion of delayed measurements
-          enabled: false
+          enabled: true
           buffer_size: 200 # [samples] how many states and corrections are kept in history (i.e. estimator running at the default 100 Hz rate will be able to fuse corrections with up to 2 s delay with buffer size of 200 samples)
 
         process_noise: # process noise covariance (Q)
@@ -153,11 +151,11 @@ mrs_uav_managers:
 
         pos_liosam:
           state_id: 0 # 0 - position, 1 - velocity, 2 - acceleration
-          noise: 1.0 # measurement noise covariance (R)
+          noise: 10.0 # measurement noise covariance (R)
           noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
           message:
             type: "nav_msgs/Odometry"
-            topic: "liosam/fusion/odometry" # without uav namespace
+            topic: "rosbag_liosam/fusion/odometry" # without uav namespace
             limit: 
               delay: 2.0 # [s] messages with higher delay will flag correction as unhealthy
               time_since_last: 1.0 # [s] larger time step between messages will flag correction as unhealthy
@@ -167,11 +165,11 @@ mrs_uav_managers:
         vel_liosam:
           state_id: 1 # 0 - position, 1 - velocity, 2 - acceleration
           body_frame: false # exception: liosam velocity is already in the nav frame
-          noise: 10.0 # measurement noise covariance (R)
+          noise: 1000.0 # measurement noise covariance (R)
           noise_unhealthy_coeff: 100.0 # covariance gets multiplied by this coefficient when correction is unhealthy (R)
           message:
             type: "nav_msgs/Odometry"
-            topic: "liosam/fusion/odometry" # without uav namespace
+            topic: "rosbag_liosam/fusion/odometry" # without uav namespace
             limit: 
               delay: 2.0 # [s] messages with higher delay will flag correction as unhealthy
               time_since_last: 1.0 # [s] larger time step between messages will flag correction as unhealthy

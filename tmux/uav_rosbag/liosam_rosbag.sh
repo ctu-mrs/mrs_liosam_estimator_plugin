@@ -19,19 +19,20 @@ MAIN_DIR=~/"bag_files"
 
 # the project name
 # * is used to define folder name in ~/$MAIN_DIR
-PROJECT_NAME=just_flying
+PROJECT_NAME=liosam_rosbag
 
 # the name of the TMUX session
 # * can be used for attaching as 'tmux a -t <session name>'
 SESSION_NAME=mav
 
-# export UAV_NUMBER=$(shuf -i 1-30 -n 1);
-export UAV_NUMBER=1
-export UAV_NAME=uav$UAV_NUMBER
-export ODOMETRY_TYPE=liosam
+BAG_DATASET="camp"
+# SOURCE_IMU="custom_imu_1"
+SOURCE_IMU="motor_speeds"
+
+export UAV_NAME=uav25
 
 # following commands will be executed first, in each window
-pre_input="export UAV_NAME="uav${UAV_NUMBER}"; export UAV_NUMBER=$UAV_NUMBER export RUN_TYPE=simulation; export UAV_TYPE=x500; export WORLD_NAME=simulation; export SENSORS='garmin_down'; export ODOMETRY_TYPE='liosam'"
+pre_input="export UAV_NAME="${UAV_NAME}" export RUN_TYPE=realworld"
 
 # define commands
 # 'name' 'command'
@@ -39,41 +40,23 @@ pre_input="export UAV_NAME="uav${UAV_NUMBER}"; export UAV_NUMBER=$UAV_NUMBER exp
 # * "new line" after the command    => the command will be called after start
 # * NO "new line" after the command => the command will wait for user's <enter>
 input=(
-  'Gazebo' "waitForRos; roslaunch mrs_uav_gazebo_simulation simulation.launch world_name:=forest gui:=true
-"
-  'Spawn' 'waitForTime; rosservice call /mrs_drone_spawner/spawn "$UAV_NUMBER $UAV_TYPE --enable-rangefinder --enable-ground-truth --enable-ouster --ouster-model OS0-32 --use-gpu-ray --pos 0 0 0 0"
+  'rosbag' 'waitForRos; rosparam set use_sim_time true; sleep 5; rosbag play bag_files/'$BAG_DATASET'.bag --clock
 '
-  'HWApi' 'waitForTime; roslaunch mrs_uav_px4_api api.launch
+  # 'static_tf' 'waitForRos; rosrun tf2_ros static_transform_publisher 0.0 0.0 0.1414 0 0 0 '$UAV_NAME'/fcu '$UAV_NAME'/os_sensor
+# '
+  'SLAM' 'waitForTime; roslaunch gtsam_playground slam_pipeline.launch OUSTER_TYPE:=OS1-16 liosam/imu_type:='$SOURCE_IMU' rosbag_replay:=true
+  'estimation' 'waitForTime; roslaunch mrs_uav_managers estimation_manager.launch UAV_NAME:='$UAV_NAME' world_config:=custom_configs/world_config.yaml custom_config:=custom_configs/custom_config.yaml
 '
-  'Status' "waitForHw; roslaunch mrs_uav_status status.launch
-"
-  'Control' "waitForHw; roslaunch mrs_uav_core platform_config:=`rospack find mrs_uav_gazebo_simulation`/config/mrs_uav_system/$UAV_TYPE.yaml core.launch custom_config:=./custom_configs/custom_config.yaml world_config:=./custom_configs/world_config.yaml network_config:=./custom_configs/network_config.yaml
-"
-  'SLAM' 'waitForHw; roslaunch gtsam_playground slam_pipeline.launch OUSTER_TYPE:=OS0-32
+  # 'record' 'waitForTime; rosrun rosbag record -a -x "(.*)points(.*)|(.*)cloud(.*)|(.*)map_(.*)|(.*)scan(.*)|(.*)path(.*)" -O bag_files/'$BAG_DATASET'_'$SOURCE_IMU'.bag
+# '
+  'plotjuggler' 'waitForTime; rosrun plotjuggler plotjuggler -l plotjuggler/rosbag.xml
 '
-  'AutomaticStart' "waitForControl; roslaunch mrs_uav_autostart automatic_start.launch
-"
-  "ArmAndOffboard" "waitForControl; rosservice call /$UAV_NAME/mavros/cmd/arming 1; sleep 2; rosservice call /$UAV_NAME/mavros/set_mode 0 offboard
-"
-  'GoTo' "rosservice call /$UAV_NAME/control_manager/goto \"goal: [15.0, 15.0, 2.0, 0.0]\""
-  'GoToRelative' "rosservice call /$UAV_NAME/control_manager/goto_relative \"goal: [5.0, 5.0, 1.0, 3.14]\""
-  'vio_republisher' 'waitForControl; roslaunch vins_republisher vins_republisher.launch
-'
-  'rviz' "waitForControl; waitForControl; roslaunch mrs_uav_core rviz.launch
-"
-  'robot_model' "waitForControl; waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
-"
-  'rviz_interface' "waitForControl; waitForControl; waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch
-"
-  'plot_juggler' "waitForContrl; roslaunch gtsam_playground plot_juggler.launch"
-  'gzcamera_follow' "waitForGazebo; gz camera -c gzclient_camera -f $UAV_NAME
-"
   'Roscore' 'roscore
 '
 )
 
 # the name of the window to focus after start
-init_window="Status"
+init_window="SLAM"
 
 # automatically attach to the new session?
 # {true, false}, default true
