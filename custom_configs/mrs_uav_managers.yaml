@@ -13,7 +13,7 @@ mrs_uav_managers:
     # namespace of the state estimator
     liosam:
 
-      address: "liosam/liosamEstimatorPlugin"
+      address: "liosam/LiosamEstimatorPlugin"
 
       requires: # data required from the hw api
         gnss: false
