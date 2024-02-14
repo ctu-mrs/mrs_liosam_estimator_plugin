@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
 
-  <name>liosam_mrs_estimator_plugin</name>
+  <name>mrs_liosam_estimator_plugin</name>
   <version>1.0.0</version>
   <description>Lio-sam MRS state estimator plugin</description>
 

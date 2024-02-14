@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0048 NEW)
-project(liosam_mrs_estimator_plugin)
+project(mrs_liosam_estimator_plugin)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
