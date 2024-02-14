@@ -18,7 +18,7 @@
   <depend>mrs_uav_state_estimators</depend>
 
   <export>
-    <mrs_uav_managers plugin="${prefix}/plugins.xml" />
+    <mrs_uav_managers plugin="${prefix}/estimator_plugins.xml" />
   </export>
 
 </package>
